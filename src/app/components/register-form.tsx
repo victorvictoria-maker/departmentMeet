@@ -15,10 +15,11 @@ import Link from "next/link";
 
 export default function RegisterForm() {
   const initialState = { message: null, errors: {} };
-  const [state, dispatch] = useFormState(register, initialState);
+  //   const [state, dispatch] = useFormState(register, initialState);
 
   return (
-    <form className='space-y-3' action={dispatch}>
+    <form className='space-y-3'>
+      {/* action={dispatch} */}
       <div className='flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8'>
         <h1 className={`${lusitana.className} mb-3 text-2xl`}>
           Please Signup.
