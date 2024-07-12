@@ -46,7 +46,7 @@ export default function RegisterForm() {
             </div>
 
             {/* handle error for email */}
-            <div id='email-error' aria-live='polite' aria-atomic='true'>
+            {/* <div id='email-error' aria-live='polite' aria-atomic='true'>
               {state?.errors?.email &&
                 state?.errors?.email.map((error: string) => {
                   return (
@@ -55,7 +55,7 @@ export default function RegisterForm() {
                     </p>
                   );
                 })}
-            </div>
+            </div> */}
           </div>
           <div>
             <label
@@ -78,7 +78,7 @@ export default function RegisterForm() {
             </div>
 
             {/* handle error for name */}
-            <div id='name-error' aria-live='polite' aria-atomic='true'>
+            {/* <div id='name-error' aria-live='polite' aria-atomic='true'>
               {state?.errors?.name &&
                 state?.errors?.name.map((error: string) => {
                   return (
@@ -87,7 +87,7 @@ export default function RegisterForm() {
                     </p>
                   );
                 })}
-            </div>
+            </div> */}
           </div>
           <div className='mt-4'>
             <label
@@ -111,7 +111,7 @@ export default function RegisterForm() {
             </div>
 
             {/* handle error for passsword */}
-            <div id='password-error' aria-live='polite' aria-atomic='true'>
+            {/* <div id='password-error' aria-live='polite' aria-atomic='true'>
               {state?.errors?.password &&
                 state?.errors?.password.map((error: string) => {
                   return (
@@ -120,7 +120,7 @@ export default function RegisterForm() {
                     </p>
                   );
                 })}
-            </div>
+            </div> */}
           </div>
 
           <div className='mt-4'>
@@ -145,7 +145,7 @@ export default function RegisterForm() {
             </div>
 
             {/* handle error for confirm passsword */}
-            <div
+            {/* <div
               id='confirm-password-error'
               aria-live='polite'
               aria-atomic='true'
@@ -158,22 +158,22 @@ export default function RegisterForm() {
                     </p>
                   );
                 })}
-            </div>
+            </div> */}
           </div>
         </div>
-        <RegisterButton />
+        {/* <RegisterButton /> */}
         <div
           className='flex h-8 items-end space-x-1'
           aria-live='polite'
           aria-atomic='true'
         >
           {/* Add form errors here */}
-          {state?.message && (
+          {/* {state?.message && (
             <>
               <ExclamationCircleIcon className='h-5 w-5 text-red-500' />
               <p className='text-sm text-red-500'>{state?.message}</p>
             </>
-          )}
+          )} */}
         </div>
       </div>
       <div className='text-center text-sm text-gray-500'>
@@ -188,11 +188,11 @@ export default function RegisterForm() {
   );
 }
 
-function RegisterButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button className='mt-4 w-full' aria-disabled={pending}>
-      Register <ArrowRightIcon className='ml-auto h-5 w-5 text-gray-50' />
-    </Button>
-  );
-}
+// function RegisterButton() {
+//   const { pending } = useFormStatus();
+//   return (
+//     <Button className='mt-4 w-full' aria-disabled={pending}>
+//       Register <ArrowRightIcon className='ml-auto h-5 w-5 text-gray-50' />
+//     </Button>
+//   );
+// }
