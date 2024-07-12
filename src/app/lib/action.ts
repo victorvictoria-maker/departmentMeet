@@ -1,28 +1,29 @@
-'use server';
+"use server";
 
-import { sql } from '@vercel/postgres';
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
-import { z } from 'zod';
+import { sql } from "@vercel/postgres";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { z } from "zod";
 
-import { signIn } from '@/auth';
-import { AuthError } from 'next-auth';
-import bcrypt from 'bcrypt';
-import { isRedirectError } from 'next/dist/client/components/redirect';
+// import { signIn } from "@/auth";
+import { AuthError } from "next-auth";
+import bcrypt from "bcrypt";
+import { isRedirectError } from "next/dist/client/components/redirect";
+import { signIn } from "../../../auth";
 
 export async function authenticate(
   prevState: string | undefined,
-  formData: FormData,
+  formData: FormData
 ) {
   try {
-    await signIn('credentials', formData);
+    await signIn("credentials", formData);
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
-        case 'CredentialsSignin':
-          return 'Invalid credentials.';
+        case "CredentialsSignin":
+          return "Invalid credentials.";
         default:
-          return 'Something went wrong.';
+          return "Something went wrong.";
       }
     }
     throw error;
@@ -37,14 +38,14 @@ const RegisterSchema = z.object({
 });
 
 const Register = RegisterSchema.omit({ confirmPassword: true });
-const RegisterType = Register['_output'];
+const RegisterType = Register["_output"];
 
 const FullRegisterSchema = RegisterSchema.refine(
   (data) => data.confirmPassword === data.password,
   {
-    message: 'Password does not match',
-    path: ['confirmPassword'],
-  },
+    message: "Password does not match",
+    path: ["confirmPassword"],
+  }
 );
 
 export type RegisterState = {
@@ -68,20 +69,20 @@ async function createUser(formData: typeof RegisterType) {
 
 export async function register(
   prevState: RegisterState | undefined,
-  formData: FormData,
+  formData: FormData
 ) {
   try {
     const validatedFields = FullRegisterSchema.safeParse({
-      email: formData.get('email'),
-      name: formData.get('name'),
-      password: formData.get('password'),
-      confirmPassword: formData.get('confirm-password'),
+      email: formData.get("email"),
+      name: formData.get("name"),
+      password: formData.get("password"),
+      confirmPassword: formData.get("confirm-password"),
     });
 
     if (!validatedFields.success) {
       return {
         errors: validatedFields.error.flatten().fieldErrors,
-        message: 'Missing Fields. Failed to Create User, please try again.',
+        message: "Missing Fields. Failed to Create User, please try again.",
       };
     }
 
@@ -99,26 +100,26 @@ export async function register(
 
     if (rowCount !== 1) {
       return {
-        message: 'Database error. Failed to create user.',
+        message: "Database error. Failed to create user.",
       };
     }
 
     // sign in if user has been created
-    await signIn('credentials', { email, password });
+    await signIn("credentials", { email, password });
   } catch (error: string | any) {
     // handle user exists
-    if (error.code == '23505') {
+    if (error.code == "23505") {
       return {
-        message: 'Email already exists. Please sign in.',
+        message: "Email already exists. Please sign in.",
       };
     }
 
     if (isRedirectError(error)) {
-      redirect('/dashboard');
+      redirect("/dashboard");
     }
 
     return {
-      message: 'Something went wrong, please try again.',
+      message: "Something went wrong, please try again.",
     };
   }
 }
@@ -126,13 +127,13 @@ export async function register(
 const FormSchema = z.object({
   id: z.string(),
   customerId: z.string({
-    invalid_type_error: 'Please select a customer.',
+    invalid_type_error: "Please select a customer.",
   }),
   amount: z.coerce
     .number()
-    .gt(0, { message: 'Please enter an amount greater than $0.' }),
-  status: z.enum(['pending', 'paid'], {
-    invalid_type_error: 'Please select an invoice status.',
+    .gt(0, { message: "Please enter an amount greater than $0." }),
+  status: z.enum(["pending", "paid"], {
+    invalid_type_error: "Please select an invoice status.",
   }),
   date: z.string(),
 });
@@ -153,23 +154,23 @@ export type State = {
 export async function createInvoice(prevState: State, formData: FormData) {
   // Validate form using Zod
   const validatedFields = CreateInvoice.safeParse({
-    customerId: formData.get('customerId'),
-    amount: formData.get('amount'),
-    status: formData.get('status'),
+    customerId: formData.get("customerId"),
+    amount: formData.get("amount"),
+    status: formData.get("status"),
   });
 
   // If form validation fails, return errors early. Otherwise, continue.
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Create Invoice.',
+      message: "Missing Fields. Failed to Create Invoice.",
     };
   }
 
   // Prepare data for insertion into the database
   const { customerId, amount, status } = validatedFields.data;
   const amountInCents = amount * 100;
-  const date = new Date().toISOString().split('T')[0];
+  const date = new Date().toISOString().split("T")[0];
 
   // Insert data into the database
   try {
@@ -180,20 +181,20 @@ export async function createInvoice(prevState: State, formData: FormData) {
   } catch (error) {
     // If a database error occurs, return a more specific error.
     return {
-      message: 'Database Error: Failed to Create Invoice.',
+      message: "Database Error: Failed to Create Invoice.",
     };
   }
 
   // Revalidate the cache for the invoices page and redirect the user.
-  revalidatePath('/dashboard/invoices');
-  redirect('/dashboard/invoices');
+  revalidatePath("/dashboard/invoices");
+  redirect("/dashboard/invoices");
 }
 
 export async function updateInvoice(id: string, formData: FormData) {
   const { customerId, amount, status } = UpdateInvoice.parse({
-    customerId: formData.get('customerId'),
-    amount: formData.get('amount'),
-    status: formData.get('status'),
+    customerId: formData.get("customerId"),
+    amount: formData.get("amount"),
+    status: formData.get("status"),
   });
 
   const amountInCents = amount * 100;
@@ -205,19 +206,19 @@ export async function updateInvoice(id: string, formData: FormData) {
         WHERE id = ${id}
       `;
   } catch (error) {
-    return { message: 'Database Error: Failed to Update Invoice.' };
+    return { message: "Database Error: Failed to Update Invoice." };
   }
 
-  revalidatePath('/dashboard/invoices');
-  redirect('/dashboard/invoices');
+  revalidatePath("/dashboard/invoices");
+  redirect("/dashboard/invoices");
 }
 
 export async function deleteInvoice(id: string) {
   try {
     await sql`DELETE FROM invoices WHERE id = ${id}`;
-    revalidatePath('/dashboard/invoices');
-    return { message: 'Deleted Invoice.' };
+    revalidatePath("/dashboard/invoices");
+    return { message: "Deleted Invoice." };
   } catch (error) {
-    return { message: 'Database Error: Failed to Delete Invoice.' };
+    return { message: "Database Error: Failed to Delete Invoice." };
   }
 }
